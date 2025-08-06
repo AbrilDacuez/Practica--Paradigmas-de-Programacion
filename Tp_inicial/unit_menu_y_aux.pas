@@ -4,12 +4,22 @@ Unit unit_menu_y_aux;
 Interface
 
 Uses 
-unit_lista;
-// unit_archivo;
+//unit_lista;
+unit_archivo;
 
 Procedure menu();
 
 Implementation
+
+Function cambia_fecha(fecha:string):string;
+var 
+dia,mes,anio:string;
+begin
+  dia:=copy(fecha,1,2);
+  mes:=copy(fecha,4,2);
+  anio:=copy(fecha,7,4);
+  cambia_fecha:=anio+'/'+mes+'/'+dia;
+end;
 
 Procedure cargar_datos(Var L:TListaEventos; Var id: integer);
 
@@ -23,8 +33,10 @@ Begin
   readln(E.descripcion);
   writeln('Ingrese fecha de inicio (dd/mm/yyyy):');
   readln(E.fechainicio);
+  E.fechainicio := cambia_fecha(E.fechainicio);
   writeln('Ingrese fecha de fin (dd/mm/yyyy):');
   readln(E.fechafin);
+  E.fechafin := cambia_fecha(E.fechafin);
   writeln('Ingrese hora de inicio (hh:mm):');
   readln(E.horainicio);
   writeln('Ingrese hora de fin (hh:mm):');
@@ -71,8 +83,10 @@ Var fe1,fe2: string;
 Begin
   write('Ingrese fecha 1: ');
   ReadLn(fe1);
+  fe1 := cambia_fecha(fe1); // Cambiar formato de fecha
   write('Ingrese fecha 2: ');
   ReadLn(fe2);
+  fe2 := cambia_fecha(fe2); // Cambiar formato de fecha
 
   BUSCAR_entre_fechas(L, fe1, fe2);
 End;

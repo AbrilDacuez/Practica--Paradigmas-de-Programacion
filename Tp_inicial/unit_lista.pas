@@ -64,7 +64,7 @@ Var
 Begin
   enc := false;
   i := 1;
-  While (i < L.cant) And (Not enc) Do
+  While (i <= L.cant) And (Not enc) Do
     Begin
       If L.eventos[i].id = id Then enc := true
       Else inc(i);
@@ -119,8 +119,8 @@ Begin
       // Incrementar la cantidad de eventos
       L.eventos[L.cant] := X;
       // Agregar el nuevo evento al final del array
+      id:= L.cant + 1;
       L.eventos[L.cant].id := id;
-      inc(id);
     End;
 End;
 
