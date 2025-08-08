@@ -65,47 +65,54 @@ End;
 
 Procedure ELIMINAREVENTO (Var L: TListaEventos; id: integer);
 Var
-  aux: Teventos;
-  X: TEvento;
+  i, total: Integer;
   eventoTemp: TEvento;
   encontrado: Boolean;
-  nombreOriginal, nombreAux: String;
 Begin
   encontrado := False;
-  nombreOriginal := 'eventos.dat';
-  nombreAux := 'temporal.dat';
 
-  Assign(aux, nombreAux);
-  Rewrite(aux);               // Crea archivo auxiliar vacío
-  Reset(L.eventos);           // Abre archivo original
+  Reset(L.eventos);
+  total := FileSize(L.eventos);
 
-  While Not EOF(L.eventos) Do
+  i := 0;
+  While (i < total) Do
   Begin
+    Seek(L.eventos, i);
     Read(L.eventos, eventoTemp);
 
-    If eventoTemp.id = id Then
+    If (not encontrado) and (eventoTemp.id = id) Then
     Begin
-      X := eventoTemp;     
       encontrado := True;
-      // No lo copiamos al archivo auxiliar (se elimina)
+      // No copiamos este registro (se "elimina")
     End
-    Else
-      Write(aux, eventoTemp); // Copiamos eventos distintos al buscado
+    Else If encontrado Then
+    Begin
+      // Solo desplazamos registros si no es el último registro
+      If i < total - 1 Then
+      Begin
+        Seek(L.eventos, i + 1);
+        Read(L.eventos, eventoTemp);
+        Seek(L.eventos, i);
+        Write(L.eventos, eventoTemp);
+      End;
+    End;
+
+    Inc(i);
   End;
 
-  Close(L.eventos);
-  Close(aux);
-
-  // Reemplazamos el archivo original por el auxiliar
-  Erase(L.eventos);
-  Rename(aux, nombreOriginal);
-
-  Assign(L.eventos, nombreOriginal); // Reasignar por si se sigue usando
-  Reset(L.eventos);                  // Reabrir para siguiente uso
-
   If encontrado Then
-    Dec(L.cant);                     // Disminuir cantidad de eventos
+  Begin
+    Seek(L.eventos, total - 1);
+    Truncate(L.eventos);
+    Dec(L.cant);
+  End
+  Else
+    WriteLn('No se encontró el evento con ID ', id);
+
+  Close(L.eventos);
 End;
+
+
 
 
 
