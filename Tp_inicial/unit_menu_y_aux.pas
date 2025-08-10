@@ -5,12 +5,57 @@ Interface
 
 Uses 
 //unit_lista;
-unit_archivo;
+unit_tipoeventos;
 
 Procedure menu();
-
+Procedure no_se_encontroevento();
+procedure nocoincidencia();
+procedure escribirTevento();
+procedure escribir_tiposeventos(var E: TEvento);
+procedure escribir_muestradatos(E: TEvento);
 Implementation
-
+procedure escribir_muestradatos(E: TEvento);
+begin
+  Writeln('ID: ', E.id);
+  Writeln('Título: ', E.titulo);
+  Writeln('Descripción: ', E.descripcion);
+  Writeln('Ubicación: ', E.ubicacion);
+  Writeln('Fecha Inicio: ', E.fechainicio, '  Hora Inicio: ', E.horainicio);
+  Writeln('Fecha Fin: ', E.fechafin, '  Hora Fin: ', E.horafin);
+  Write('Tipo de evento: ');
+end;
+procedure escribir_tiposeventos(var E: TEvento, tipo:integer);
+begin
+  Write('Título: '); Readln(E.titulo);
+  Write('Descripción: '); Readln(E.descripcion);
+  Write('Ubicación: '); Readln(E.ubicacion);
+  Write('Fecha inicio (YYYY-MM-DD): '); Readln(E.fechainicio);
+  Write('Fecha fin (YYYY-MM-DD): '); Readln(E.fechafin);
+  Write('Hora inicio (HH:MM): '); Readln(E.horainicio);
+  Write('Hora fin (HH:MM): '); Readln(E.horafin);
+  Write('Tipo de evento (0: cumple, 1: reunión, 2: otro): '); Readln(tipo);
+end;
+Procedure no_se_encontroevento();
+begin
+  writeln('No se encontro el evento');
+  writeln('Presione una tecla para continuar...');
+  readln;
+end;
+procedure nocoincidencia();
+begin
+  writeln('No se encontraron coincidencias');
+  writeln('Presione una tecla para continuar...');
+  readln;
+end;
+procedure escribirTevento(E:TEvento);
+begin
+   Case E.t_evento of
+    cumple: Writeln('Cumpleaños');
+    reunion: Writeln('Reunión');
+    otro: Writeln('Otro');
+  End;
+  Writeln('------------------------');
+end;
 Function cambia_fecha(fecha:string):string;
 var 
 dia,mes,anio:string;
