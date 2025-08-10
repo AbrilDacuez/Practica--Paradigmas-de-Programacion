@@ -5,7 +5,7 @@ Interface
 
 Uses 
 //unit_lista;
-unit_archivo,unit_tipoeventos;
+unit_tipoeventos;
 
 Procedure menu();
 Procedure no_se_encontroevento();
