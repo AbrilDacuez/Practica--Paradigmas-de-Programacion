@@ -2,6 +2,7 @@
 Unit unit_lista;
 
 Interface
+uses unit_menu_y_aux;
 
 Type 
   t_evento = (cumple, reunion, otro);
@@ -98,7 +99,7 @@ Begin
       WriteLn('Evento ', id, ' borrado');
     End
   Else
-    writeln('Evento no encontrado');
+    no_se_encontroevento();
 End;
 
 Function LISTA_LLENA (Var L:TListaEventos): BOOLEAN;
@@ -173,7 +174,7 @@ Begin
           inc(cont);
         End;
     End;
-  If cont = 0 Then WriteLn('No hay coincidencias');
+  If cont = 0 Then nocoincidencia();
 End;
 
 Procedure BUSCAR_entre_fechas(L:TListaEventos; fecha1,fecha2:String);
@@ -196,7 +197,7 @@ Begin
           inc(cont);
         End;
     End;
-  If cont = 0 Then WriteLn('No hay coincidencias');
+  If cont = 0 Then nocoincidencia();
 End;
 
 Procedure BUSCAR_tipo (L:TListaEventos; tipo:t_evento);
@@ -215,7 +216,7 @@ Begin
           inc(cont);
         End;
     End;
-  If cont = 0 Then WriteLn('No hay coincidencias');
+  If cont = 0 Then nocoincidencia();
 End;
 
 

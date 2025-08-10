@@ -3,29 +3,7 @@ Unit unit_archivo;
 
 Interface
 
-Type 
-
-  TTipoEvento = (cumple, reunion, otro);
-
-  TEvento = Record
-    id: integer;
-    fechainicio: string[10];
-    fechafin: string[10];
-    horainicio: string;
-    horafin: string;
-    ubicacion: string;
-    titulo: string;
-    descripcion: string;
-    t_evento: TTipoEvento;
-  End;
-
-  Teventos = file Of TEvento;
-
-  TListaEventos = Record
-    cant: integer;
-    eventos: Teventos;
-  End;
-
+Uses unit_tipoeventos,unit_menu_y_aux;
 
 Procedure CREARLISTA (Var L:TListaEventos);
 Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer);
@@ -39,7 +17,6 @@ Procedure BUSCAR_tipo (L:TListaEventos; tipo:TTipoEvento);
 
 
 Implementation
-
 Procedure CREARLISTA (Var L: TListaEventos);
 var 
 nombreArchivo: string;
@@ -132,37 +109,17 @@ begin
   End;
 end;
 
-Procedure pedir_datos (Var E:TEvento);
-Var
-  tipo: Integer;
+Procedure pedir_datos (Var E:TEvento, tipo:integer);
 Begin
   //Write('ID: '); E.id:=0; ID se asigna en el agregar
-  Write('Título: '); Readln(E.titulo);
-  Write('Descripción: '); Readln(E.descripcion);
-  Write('Ubicación: '); Readln(E.ubicacion);
-  Write('Fecha inicio (YYYY-MM-DD): '); Readln(E.fechainicio);
-  Write('Fecha fin (YYYY-MM-DD): '); Readln(E.fechafin);
-  Write('Hora inicio (HH:MM): '); Readln(E.horainicio);
-  Write('Hora fin (HH:MM): '); Readln(E.horafin);
-  Write('Tipo de evento (0: cumple, 1: reunión, 2: otro): '); Readln(tipo);
+  escribir_tiposeventos(E,tipo);
   E.t_evento := TTipoEventoF(tipo);
 End;
 
 Procedure Muestra_datos(E: TEvento);
 Begin
-  Writeln('ID: ', E.id);
-  Writeln('Título: ', E.titulo);
-  Writeln('Descripción: ', E.descripcion);
-  Writeln('Ubicación: ', E.ubicacion);
-  Writeln('Fecha Inicio: ', E.fechainicio, '  Hora Inicio: ', E.horainicio);
-  Writeln('Fecha Fin: ', E.fechafin, '  Hora Fin: ', E.horafin);
-  Write('Tipo de evento: ');
-  Case E.t_evento of
-    cumple: Writeln('Cumpleaños');
-    reunion: Writeln('Reunión');
-    otro: Writeln('Otro');
-  End;
-  Writeln('------------------------');
+  escribir_muestradatos(E);
+  escribirTevento(E.t_evento);
 End;
 
 Procedure MUESTRA_LISTA(L: TListaEventos);
@@ -239,7 +196,7 @@ Begin
   Close(L.eventos);
 
   If cont = 0 Then
-    WriteLn('No hay coincidencias');
+    nocoincidencia();
 End;
 
 
