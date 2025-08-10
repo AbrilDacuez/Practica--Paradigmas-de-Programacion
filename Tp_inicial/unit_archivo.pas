@@ -3,17 +3,21 @@ Unit unit_archivo;
 
 Interface
 
-Uses unit_tipoeventos,unit_menu_y_aux;
+Uses unit_tipoeventos;
 
-Procedure CREARLISTA (Var L:TListaEventos);
-Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer);
-Function LISTA_LLENA (Var L:TListaEventos): BOOLEAN;
-Function LISTA_VACIA (Var L:TListaEventos): BOOLEAN;
+Procedure CREARLISTA (Var L: TListaEventos);
 Procedure AGREGAR (Var L:TListaEventos; E:TEvento; Var id: integer);
-Procedure MUESTRA_LISTA(L:TListaEventos);
-Procedure BUSCAR_titulo (L:TListaEventos; BUSCADO:String);
-Procedure BUSCAR_entre_fechas(L:TListaEventos; fecha1,fecha2:String);
-Procedure BUSCAR_tipo (L:TListaEventos; tipo:TTipoEvento);
+Procedure ELIMINAREVENTO (Var L: TListaEventos; id: integer, flag:boolean);
+Function LISTA_LLENA(Var L: TListaEventos): BOOLEAN;
+Function Lista_vacia (Var L: TListaEventos): boolean;
+Function TTipoEventoF(tipo:Integer): TTipoEvento;
+Procedure pedir_datos (Var E:TEvento, tipo:integer);
+Procedure Muestra_datos(E: TEvento);
+Procedure MUESTRA_LISTA(L: TListaEventos);
+Procedure BUSCAR_titulo(L: TListaEventos; BUSCADO: String);
+Procedure BUSCAR_entre_fechas(L: TListaEventos; fecha1, fecha2: String);
+Procedure BUSCAR_tipo(L: TListaEventos; tipo: TTipoEvento);
+
 
 
 Implementation
@@ -40,11 +44,10 @@ Begin
   Close(L.eventos);
 End;
 
-Procedure ELIMINAREVENTO (Var L: TListaEventos; id: integer);
+Procedure ELIMINAREVENTO (Var L: TListaEventos; id: integer,var encontrado:boolean);
 Var
   i, total: Integer;
   eventoTemp: TEvento;
-  encontrado: Boolean;
 Begin
   encontrado := False;
 
@@ -82,9 +85,7 @@ Begin
     Seek(L.eventos, total - 1);
     Truncate(L.eventos);
     Dec(L.cant);
-  End
-  Else
-    WriteLn('No se encontró el evento con ID ', id);
+  End;
 
   Close(L.eventos);
 End;
@@ -116,19 +117,6 @@ begin
   End;
 end;
 
-Procedure pedir_datos (Var E:TEvento, tipo:integer);
-Begin
-  //Write('ID: '); E.id:=0; ID se asigna en el agregar
-  escribir_tiposeventos(E,tipo);
-  E.t_evento := TTipoEventoF(tipo);
-End;
-
-Procedure Muestra_datos(E: TEvento);
-Begin
-  escribir_muestradatos(E);
-  escribirTevento(E.t_evento);
-End;
-
 Procedure MUESTRA_LISTA(L: TListaEventos);
 Var
   E: TEvento;
@@ -142,69 +130,71 @@ Begin
   Close(L.eventos);
 End;
 
-Procedure BUSCAR_titulo(L: TListaEventos; BUSCADO: String);
+Procedure BUSCAR_titulo(L: TListaEventos; BUSCADO: String; var pos: integer; var encontrado: boolean; var E: TEvento);
 Var
-  E: TEvento;
-  aux:integer;
-  ENC:BOOLEAN;
+  aux: integer;
 Begin
-  ENC := False;
+  encontrado := False;
   Reset(L.eventos);
-  While Not Eof(L.eventos) Do
-  Begin
+  if pos = 0 then
+  Seek(L.eventos, pos - 1) else Seek(L.eventos,pos);
+  while (FilePos(L.eventos) < FileSize(L.eventos)) and (not encontrado) do
+  begin
     Read(L.eventos, E);
     aux := Pos(LowerCase(BUSCADO), LowerCase(E.titulo));
-    If aux > 0 Then
-    Begin
-      Muestra_datos(E);
-      ENC := True;
-    End;
-  End;
+    if aux > 0 then
+    begin
+      encontrado := True;
+      pos := FilePos(L.eventos); 
+    end;
+  end;
   Close(L.eventos);
-End;
+end;
 
-Procedure BUSCAR_entre_fechas(L: TListaEventos; fecha1, fecha2: String);
-Var
-  E: TEvento;
-  ENC:BOOLEAN;
-Begin
-  ENC := False;
+
+Procedure BUSCAR_entre_fechas(L: TListaEventos; fecha1, fecha2: String; var encontrado: boolean; var pos: integer; var E: TEvento);
+begin
+  encontrado := false;
   Reset(L.eventos);
-  While Not Eof(L.eventos) Do
-  Begin
-    Read(L.eventos, E);
-    If (E.fechainicio >= fecha1) And (E.fechafin <= fecha2) Then
-    Begin
-      Muestra_datos(E);
-      ENC := True;
-    End;
-  End;
-  Close(L.eventos);
-End;
+  Seek(L.eventos, pos - 1); // convertir índice humano a índice de archivo (0-based)
 
-Procedure BUSCAR_tipo(L: TListaEventos; tipo: TTipoEvento);
-Var
-  E: TEvento;
-  cont: Integer;
-Begin
-  cont := 0;
-  Reset(L.eventos);  
-
-  While Not EOF(L.eventos) Do
-  Begin
+  while (FilePos(L.eventos) < FileSize(L.eventos)) and (not encontrado) do
+  begin
     Read(L.eventos, E);
-    If E.t_evento = tipo Then
-    Begin
-      Muestra_datos(E);
-      Inc(cont);
-    End;
-  End;
+    if (E.fechainicio >= fecha1) and (E.fechainicio <= fecha2) and
+       (E.fechafin   >= fecha1) and (E.fechafin   <= fecha2) then
+    begin
+      encontrado := true;
+      pos := FilePos(L.eventos) + 1; // dejar lista para la próxima búsqueda
+    end;
+  end;
 
   Close(L.eventos);
+end;
 
-  If cont = 0 Then
-    nocoincidencia();
-End;
+
+Procedure BUSCAR_tipo(L: TListaEventos; tipo: TTipoEvento; var encontrado: boolean; var pos: integer; var E: TEvento);
+begin
+  encontrado := false;
+  Reset(L.eventos);
+  if pos = 0 then
+  Seek(L.eventos, pos - 1) else 
+  Seek(L.eventos,pos);
+  while (FilePos(L.eventos) < FileSize(L.eventos)) and (not encontrado) do
+  begin
+    Read(L.eventos, E);
+    if E.t_evento = tipo then
+    begin
+      encontrado := true;
+      pos := FilePos(L.eventos) + 1; 
+    end;
+  end;
+
+  Close(L.eventos);
+end;
+
+
+end.
 
 
 

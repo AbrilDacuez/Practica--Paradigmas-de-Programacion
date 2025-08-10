@@ -2,22 +2,10 @@
 Unit unit_lista;
 
 Interface
-uses unit_menu_y_aux;
+uses unit_tipoeventos;
 
 Type 
-  t_evento = (cumple, reunion, otro);
-
-  TEvento = Record
-    id: integer;
-    fechainicio: string[10];
-    fechafin: string[10];
-    horainicio: string;
-    horafin: string;
-    ubicacion: string;
-    titulo: string;
-    descripcion: string;
-    t_evento: t_evento;
-  End;
+ Tipo_evento= TTipoEvento;
 
   TListaEventos = Record
     eventos: array[1..200] Of TEvento ;
@@ -25,14 +13,16 @@ Type
   End;
 
 Procedure CREARLISTA (Var L:TListaEventos);
-Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer);
+Procedure BUSCARPORID(L: TListaEventos; id: integer; Var pos: Integer);
+Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer; var encontrado:boolean);
 Function LISTA_LLENA (Var L:TListaEventos): BOOLEAN;
 Function LISTA_VACIA (Var L:TListaEventos): BOOLEAN;
 Procedure AGREGAR (Var L:TListaEventos; X:TEvento; Var id: integer);
-Procedure MUESTRA_LISTA(L:TListaEventos);
-Procedure BUSCAR_titulo (L:TListaEventos; BUSCADO:String);
-Procedure BUSCAR_entre_fechas(L:TListaEventos; fecha1,fecha2:String);
-Procedure BUSCAR_tipo (L:TListaEventos; tipo:t_evento);
+Procedure BUSCAR_titulo(L: TListaEventos; BUSCADO: String; var poss: integer; var encontrado: boolean; var E: TEvento);
+Procedure BUSCAR_entre_fechas(L: TListaEventos; fecha1, fecha2: String; var encontrado: boolean; var pos: integer; var E: TEvento);
+Procedure BUSCAR_tipo(L: TListaEventos; tipo: TTipoEvento; var encontrado: boolean; var pos: integer; var E: TEvento);
+
+
 
 Implementation
 
@@ -74,15 +64,17 @@ Begin
     pos := i
 End;
 
-Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer);
+Procedure ELIMINAREVENTO (Var L:TListaEventos; id: integer; var encontrado:boolean);
 
 Var 
   i, pos: integer;
 Begin
+  encontrado := false;
   pos := 0;
   BUSCARPORID(L, id, pos);
   If pos <> 0 Then
     Begin
+      encontrado := true;
       For i:= pos To L.cant Do
         Begin
           L.eventos[i].id := L.eventos[i+1].id;
@@ -95,11 +87,9 @@ Begin
           L.eventos[i].descripcion := L.eventos[i+1].descripcion;
         End;
       dec(L.cant);
-      // Reducir el tamaño del array
-      WriteLn('Evento ', id, ' borrado');
     End
   Else
-    no_se_encontroevento();
+    encontrado := false;
 End;
 
 Function LISTA_LLENA (Var L:TListaEventos): BOOLEAN;
@@ -125,99 +115,56 @@ Begin
     End;
 End;
 
-Procedure Muestra_datos (E:TEvento);
+
+Procedure BUSCAR_titulo(L: TListaEventos; BUSCADO: String; var poss: integer; var encontrado: boolean; var E: TEvento);
+Var
+  aux: integer;
 Begin
-  writeln('ID: ', E.id);
-  writeln('Fecha Inicio: ', E.fechainicio);
-  writeln('Fecha Fin: ', E.fechafin);
-  writeln('Hora Inicio: ', E.horainicio);
-  writeln('Hora Fin: ', E.horafin);
-  writeln('Ubicación: ', E.ubicacion);
-  writeln('Título: ', E.titulo);
-  writeln('Descripción: ', E.descripcion);
-  writeln('Tipo de Evento: ', E.t_evento);
-End;
-
-Procedure MUESTRA_LISTA(L:TListaEventos);
-//LISTADO
-
-Var 
-  E: TEvento;
-  i: integer;
-Begin
-  i := 1;
-  While (i <= L.cant) Do
-    Begin
-      E := L.eventos[i];
-      MUESTRA_DATOS(E);
-      i := i+1;
-    End;
-End;
+  encontrado := False;
+  while (poss <= L.cant) and (not encontrado) do
+  begin
+    E := L.eventos[poss]; // L.eventos es un array
+    aux := Pos(LowerCase(BUSCADO), LowerCase(E.titulo));
+    if aux > 0 then
+      encontrado := True;
+  end;
+end;
 
 
-Procedure BUSCAR_titulo (L:TListaEventos; BUSCADO:String);
 
-Var 
-  E: TEvento;
-  aux: BYTE;
-  i, cont: integer;
-Begin
-  i := 1;
-  cont := 0;
-  For i:=1 To L.cant Do
-    Begin
-      E := L.eventos[i];
-      aux := Pos(BUSCADO, E.titulo);
-      If aux > 0 Then
-        Begin
-          Muestra_datos(E);
-          inc(cont);
-        End;
-    End;
-  If cont = 0 Then nocoincidencia();
-End;
+Procedure BUSCAR_entre_fechas(L: TListaEventos; fecha1, fecha2: String; var encontrado: boolean; var pos: integer; var E: TEvento);
+begin
+  encontrado := false;
+  while (pos <= L.cant) and (not encontrado) do
+  begin
+    E := L.eventos[pos];
+    if (E.fechainicio >= fecha1) and (E.fechainicio <= fecha2) and
+       (E.fechafin   >= fecha1) and (E.fechafin   <= fecha2) then
+      encontrado := true
+    else
+      Inc(pos);
+  end;
 
-Procedure BUSCAR_entre_fechas(L:TListaEventos; fecha1,fecha2:String);
-// hay que corregir porque no sirve la comparacion de fechas con string
+  if encontrado then
+    Inc(pos); // dejar lista para la próxima búsqueda
+end;
 
-Var 
-  E: TEvento;
-  POS: BYTE;
-  i, cont: integer;
-Begin
-  i := 1;
-  cont := 0;
-  For i:=1 To L.cant Do
-    Begin
-      E := L.eventos[i];
-      If (E.fechainicio >= fecha1) And (E.fechainicio <= fecha2) And (E.
-         fechafin >= fecha1) And (E.fechafin <= fecha2)Then
-        Begin
-          Muestra_datos(E);
-          inc(cont);
-        End;
-    End;
-  If cont = 0 Then nocoincidencia();
-End;
 
-Procedure BUSCAR_tipo (L:TListaEventos; tipo:t_evento);
+Procedure BUSCAR_tipo(L: TListaEventos; tipo: TTipoEvento; var encontrado: boolean; var pos: integer; var E: TEvento);
+begin
+  encontrado := false;
+  while (pos <= L.cant) and (not encontrado) do
+  begin
+    E := L.eventos[pos];  // acceder al evento en el array
+    if E.t_evento = tipo then
+      encontrado := true
+    else
+      Inc(pos);
+  end;
 
-Var 
-  E: TEvento;
-  i, cont: integer;
-Begin
-  cont := 0;
-  For i := 1 To L.cant Do
-    Begin
-      E := L.eventos[i];
-      If E.t_evento = tipo Then
-        Begin
-          Muestra_datos(E);
-          inc(cont);
-        End;
-    End;
-  If cont = 0 Then nocoincidencia();
-End;
+  if encontrado then
+    Inc(pos); // avanzar para que la siguiente búsqueda arranque después
+end;
 
 
 End.

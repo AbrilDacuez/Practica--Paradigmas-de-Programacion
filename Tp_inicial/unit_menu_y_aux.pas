@@ -4,16 +4,25 @@ Unit unit_menu_y_aux;
 Interface
 
 Uses 
-//unit_lista;
-unit_tipoeventos;
+unit_lista, unit_tipoeventos;
 
-Procedure menu();
+procedure escribir_muestradatos(E: TEvento);
+procedure escribir_tiposeventos(var E: TEvento; tipo:integer);
 Procedure no_se_encontroevento();
 procedure nocoincidencia();
-procedure escribirTevento();
-procedure escribir_tiposeventos(var E: TEvento);
-procedure escribir_muestradatos(E: TEvento);
+procedure escribirTevento(E:TEvento);
+Function cambia_fecha(fecha:string):string;
+Procedure cargar_datos(Var L:TListaEventos; Var id: integer);
+Procedure eliminar(Var L: TListaEventos);
+  Procedure Muestra_datos (E:TEvento);
+Procedure busqueda_titulo(var L: TListaEventos);
+Procedure buscarfechas(L: TListaEventos);
+Procedure buscartipo(L: TListaEventos);
+Procedure menu();
+
+
 Implementation
+
 procedure escribir_muestradatos(E: TEvento);
 begin
   Writeln('ID: ', E.id);
@@ -24,7 +33,7 @@ begin
   Writeln('Fecha Fin: ', E.fechafin, '  Hora Fin: ', E.horafin);
   Write('Tipo de evento: ');
 end;
-procedure escribir_tiposeventos(var E: TEvento, tipo:integer);
+procedure escribir_tiposeventos(var E: TEvento; tipo:integer);
 begin
   Write('Título: '); Readln(E.titulo);
   Write('Descripción: '); Readln(E.descripcion);
@@ -103,53 +112,118 @@ End;
 Procedure eliminar(Var L: TListaEventos);
 
 Var 
-  id: integer;
+  id: integer; encontrado:boolean;
 Begin
   Write('Ingrese el id a eliminar: ');
   ReadLn(id);
 
-  ELIMINAREVENTO(L, id);
+  ELIMINAREVENTO(L, id, encontrado);
+  If encontrado Then
+    Writeln('Evento eliminado con exito')
+  Else
+    Writeln('No se encontro el evento con ID: ', id);
 End;
 
-Procedure busquedasubcad(L: TListaEventos);
+  Procedure Muestra_datos (E:TEvento);
+  Begin
+    writeln('ID: ', E.id);
+    writeln('Fecha Inicio: ', E.fechainicio);
+    writeln('Fecha Fin: ', E.fechafin);
+    writeln('Hora Inicio: ', E.horainicio);
+    writeln('Hora Fin: ', E.horafin);
+    writeln('Ubicación: ', E.ubicacion);
+    writeln('Título: ', E.titulo);
+    writeln('Descripción: ', E.descripcion);
+    writeln('Tipo de Evento: ', E.t_evento);
+  End;
 
-Var 
+Procedure busqueda_titulo(var L: TListaEventos);
+Var
   sub: string;
+  pos: integer;
+  enc: boolean;
+  E: TEvento;
 Begin
-  Write('Ingrese la palabra del titulo: ');
+  Write('Ingrese la palabra del título: ');
   ReadLn(sub);
 
-  BUSCAR_titulo(L, sub);
-End;
+  pos := 1; // arrancamos desde el primero
+  BUSCAR_titulo(L, sub, pos, enc, E);
+
+  if not enc then
+    Writeln('No se encontró ningún evento con ese título.')
+  else
+  begin
+    while enc do
+    begin
+      Muestra_datos(E);       // mostramos el encontrado
+      pos := pos + 1;         // siguiente búsqueda arranca después
+      BUSCAR_titulo(L, sub, pos, enc, E);
+    end;
+  end;
+end;
 
 Procedure buscarfechas(L: TListaEventos);
-
-Var fe1,fe2: string;
-Begin
+var
+  fe1, fe2: string;
+  pos: integer;
+  E: TEvento;
+  enc: boolean;
+begin
   write('Ingrese fecha 1: ');
   ReadLn(fe1);
-  fe1 := cambia_fecha(fe1); // Cambiar formato de fecha
+  fe1 := cambia_fecha(fe1);
+
   write('Ingrese fecha 2: ');
   ReadLn(fe2);
-  fe2 := cambia_fecha(fe2); // Cambiar formato de fecha
+  fe2 := cambia_fecha(fe2);
 
-  BUSCAR_entre_fechas(L, fe1, fe2);
-End;
+  pos := 1;
+  BUSCAR_entre_fechas(L, fe1, fe2, enc, pos, E);
+
+  if not enc then
+    Writeln('No se encontraron eventos en el rango de fechas.')
+  else
+  begin
+    while enc do
+    begin
+      Muestra_datos(E);
+      BUSCAR_entre_fechas(L, fe1, fe2, enc, pos, E);
+    end;
+  end;
+end;
+
 
 Procedure buscartipo(L: TListaEventos);
-
-Var 
+var
   op: integer;
-Begin
-  write('Ingrese tipo de evento (1: cumple, 2: reunion, 3: otro): ');
+  pos: integer;
+  E: TEvento;
+  encontrado: boolean;
+  tipo: TTipoEvento;
+begin
+  Write('Ingrese tipo de evento (1: cumple, 2: reunion, 3: otro): ');
   ReadLn(op);
 
-  Case op Of 
-    1: BUSCAR_tipo(L, cumple);
-    2: BUSCAR_tipo(L, reunion);
-    3: BUSCAR_tipo(L, otro);
-  End;
-End;
+  case op of
+    1: tipo := cumple;
+    2: tipo := reunion;
+    3: tipo := otro;
+  end;
+  pos := 1;
+  BUSCAR_tipo(L, tipo, encontrado, pos, E);
+  if not encontrado then
+    Writeln('No se encontró ningún evento de ese tipo.')
+  else
+  begin
+    while encontrado do
+    begin
+      Muestra_datos(E);
+      BUSCAR_tipo(L, tipo, encontrado, pos, E);
+    end;
+  end;
+end;
+
 
 Procedure menu();
 
@@ -178,7 +252,7 @@ Begin
       1: cargar_datos(L, ident);
       2: MUESTRA_LISTA(L);
       3: eliminar(L);
-      4: busquedasubcad(L);
+      4: busqueda_titulo(L);
       5: buscarfechas(L);
       6: buscartipo(L);
     End;
