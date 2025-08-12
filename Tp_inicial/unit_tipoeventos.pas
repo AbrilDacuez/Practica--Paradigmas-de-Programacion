@@ -1,7 +1,10 @@
-unit unit_tipoeventos;
-interface
-Type
-    TTipoEvento = (cumple, reunion, otro);
+
+Unit unit_tipoeventos;
+
+Interface
+
+Type 
+  TTipoEvento = (cumple, reunion, otro);
 
   TEvento = Record
     id: integer;
@@ -15,5 +18,10 @@ Type
     t_evento: TTipoEvento;
   End;
 
-  implementation
-  end.
+  Teventoaux = Record
+    cant: integer;
+    posiciones: array[1..200] Of integer;
+  End;
+
+Implementation
+End.
