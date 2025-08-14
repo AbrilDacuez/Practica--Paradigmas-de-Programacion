@@ -10,18 +10,19 @@ Type
   ListaEventos = object
     eventos: array[0..200] Of TEvento;
     cant: integer;
-    Procedure CREARLISTA;
-    Procedure BUSCARPORID(id: integer; Var pos: Integer);
-    Procedure ELIMINAREVENTO (id: integer; Var encontrado:
-                          boolean);
-    Procedure AGREGAR ( X:TEvento; Var id: integer);
-    Procedure BUSCAR_titulo( BUSCADO: String; Var L_aux:
+Procedure CREARLISTA;
+Procedure BUSCARPORID( id: integer; Var pos: Integer);
+Procedure ELIMINAREVENTO (id: integer; Var encontrado:boolean);
+Function LISTA_LLENA : BOOLEAN;
+Procedure AGREGAR (Var  X:TEvento; Var id: integer);
+Procedure BUSCAR_titulo( BUSCADO: String; Var L_aux:
                         Teventoaux);
-    Procedure BUSCAR_entre_fechas(fecha1, fecha2: String; Var
+Procedure BUSCAR_entre_fechas(fecha1, fecha2: String; Var
                               L_aux: Teventoaux);
-    Procedure BUSCAR_tipo(tipo: TTipoEvento; Var L_aux:
+Procedure BUSCAR_tipo( tipo: TTipoEvento; Var L_aux:
                       Teventoaux);
-    Procedure RECUPERAPOS (Var E: TEvento; pos: Integer);
+Procedure RECUPERAPOS (Var E: TEvento; pos: Integer);
+
 end;
 
 
@@ -48,7 +49,7 @@ Begin
   // Inicializar la cantidad de eventos a 0
 End;
 
-Procedure ListaEventos.BUSCARPORID(L: TListaEventos; id: integer; Var pos: Integer);
+Procedure ListaEventos.BUSCARPORID( id: integer; Var pos: Integer);
 
 Var 
   enc: Boolean;
@@ -73,7 +74,7 @@ Var
 Begin
   encontrado := false;
   pos := 0;
-  ListaEventos.BUSCARPORID(L, id, pos);
+  ListaEventos.BUSCARPORID(id, pos);
   If pos <> 0 Then
     Begin
       encontrado := true;
@@ -96,7 +97,7 @@ End;
 
 Function ListaEventos.LISTA_LLENA : BOOLEAN;
 Begin
-  ListaEventos.LISTA_LLENA := cant=200;
+  LISTA_LLENA := cant=200;
 End;
 
 Procedure ListaEventos.AGREGAR (Var  X:TEvento; Var id: integer);

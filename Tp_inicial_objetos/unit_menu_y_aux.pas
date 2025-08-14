@@ -4,25 +4,25 @@ Unit unit_menu_y_aux;
 Interface
 
 Uses 
-// unit_lista, unit_tipoeventos;
-unit_archivo, unit_tipoeventos;
-var Lista: ListaEventos;
+ unit_lista, unit_tipoeventos;
+//unit_archivo, unit_tipoeventos;
 type 
 interfacemenu = object
-  Procedure menu;
-  Function cambia_fecha(fecha:String): string;
-  Procedure cargar_datos( Var id: integer);
-  Procedure eliminar;
-  Procedure Muestra_datos (E:TEvento);
-  Procedure busqueda_titulo;
-  Procedure buscarfechas;
-  Procedure buscartipo; 
+L:ListaEventos;
+Procedure cargar_datos( Var id: integer);
+Procedure eliminar;
+Procedure MUESTRA_LISTA;
+Procedure busqueda_titulo;
+Procedure buscarfechas;
+Procedure buscartipo;
+Procedure menu();
+
  end;
 
 
 Implementation
 
-Function interfacemenu.cambia_fecha(fecha:String): string;
+Function cambia_fecha(fecha:String): string;
 
 Var 
   dia,mes,anio: string;
@@ -63,7 +63,7 @@ Begin
     Else E.t_evento := otro;
   End;
 
-  Lista.AGREGAR(E, id);
+  L.AGREGAR(E, id);
   // lo agrego a la lista
 End;
 
@@ -76,14 +76,14 @@ Begin
   Write('Ingrese el id a eliminar: ');
   ReadLn(id);
 
-  Lista.ELIMINAREVENTO( id, encontrado);
+  L.ELIMINAREVENTO( id, encontrado);
   If encontrado Then
     Writeln('Evento eliminado con exito')
   Else
     Writeln('No se encontro el evento con ID: ', id);
 End;
 
-Procedure interfacemenu.Muestra_datos (E:TEvento);
+Procedure Muestra_datos (E:TEvento);
 Begin
   writeln('ID: ', E.id);
   writeln('Fecha Inicio: ', E.fechainicio);
@@ -96,7 +96,7 @@ Begin
   writeln('Tipo de Evento: ', E.t_evento);
 End;
 
-Procedure interfacemenu.MUESTRA_LISTA( L:ListaEventos);
+Procedure interfacemenu.MUESTRA_LISTA;
 
 Var 
   i: Integer;
@@ -109,7 +109,7 @@ Begin
     End;
 End;
 
-Procedure interfacemenu.MUESTRA_LISTA_AUX ( L_aux: Teventoaux);
+Procedure MUESTRA_LISTA_AUX (var L:ListaEventos; var L_aux: Teventoaux);
 
 Var 
   i: Integer;
@@ -117,7 +117,7 @@ Var
 Begin
   For i:= 1 To L_aux.cant Do
     Begin
-      Lista.RECUPERAPOS( E, L_aux.posiciones[i]);
+      L.RECUPERAPOS( E, L_aux.posiciones[i]);
       Muestra_datos(E);
     End;
 End;
@@ -132,12 +132,12 @@ Begin
   ReadLn(sub);
 
   // arrancamos desde el primero
-  Lista.BUSCAR_titulo( sub, l_aux);
+  L.BUSCAR_titulo( sub, l_aux);
 
   If l_aux.cant = 0 Then
     Writeln('No se encontró ningún evento con ese título.')
   Else
-    MUESTRA_LISTA_AUX( l_aux);
+    MUESTRA_LISTA_AUX(L, l_aux);
 End;
 
 Procedure interfacemenu.buscarfechas;
@@ -154,16 +154,16 @@ Begin
   ReadLn(fe2);
   fe2 := cambia_fecha(fe2);
 
-  Lista.BUSCAR_entre_fechas( fe1, fe2, l_aux);
+  L.BUSCAR_entre_fechas( fe1, fe2, l_aux);
 
   If l_aux.cant = 0 Then
     Writeln('No se encontraron eventos en el rango de fechas.')
   Else
-    MUESTRA_LISTA_AUX( l_aux);
+    MUESTRA_LISTA_AUX(L, l_aux);
 End;
 
 
-Procedure interfacemenu.buscartipo(L: TListaEventos);
+Procedure interfacemenu.buscartipo;
 
 Var 
   op: integer;
@@ -178,12 +178,12 @@ Begin
     2: tipo := reunion;
     3: tipo := otro;
   End;
-  Lista.BUSCAR_tipo( tipo, l_aux);
+  L.BUSCAR_tipo( tipo, l_aux);
 
   If l_aux.cant = 0 Then
     Writeln('No se encontró ningún evento de ese tipo.')
   Else
-    MUESTRA_LISTA_AUX( l_aux);
+    MUESTRA_LISTA_AUX(L, l_aux);
 End;
 
 
@@ -191,9 +191,8 @@ Procedure interfacemenu.menu();
 
 Var 
   op, ident: integer;
-  L: TListaEventos;
 Begin
-  CREARLISTA(L);
+  L.CREARLISTA;
   ident := 1;
   Repeat
     writeln('Sistema de eventos');
@@ -211,12 +210,12 @@ Begin
     readln(op);
 
     Case op Of 
-      1: cargar_datos( ident);
-      2: MUESTRA_LISTA(L);
-      3: eliminar(L);
-      4: busqueda_titulo(L);
-      5: buscarfechas(L);
-      6: buscartipo(L);
+      1: interfacemenu.cargar_datos( ident);
+      2: interfacemenu.MUESTRA_LISTA;
+      3: interfacemenu.eliminar;
+      4: interfacemenu.busqueda_titulo;
+      5: interfacemenu.buscarfechas;
+      6: interfacemenu.buscartipo;
     End;
   Until op = 0;
 End;
