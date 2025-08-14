@@ -106,7 +106,7 @@ Begin
   For i:= 0 To (L.cant - 1) Do
     Begin
       L.RECUPERAPOS( E, i);
-      Muestra_datos(E);
+      self.Muestra_datos(E);
     End;
 End;
 
@@ -211,12 +211,12 @@ Begin
     readln(op);
 
     Case op Of 
-      1: interfacemenu.cargar_datos( ident);
-      2: interfacemenu.MUESTRA_LISTA;
-      3: interfacemenu.eliminar;
-      4: interfacemenu.busqueda_titulo;
-      5: interfacemenu.buscarfechas;
-      6: interfacemenu.buscartipo;
+      1: self.cargar_datos( ident);
+      2: self.MUESTRA_LISTA;
+      3: self.eliminar;
+      4: self.busqueda_titulo;
+      5: self.buscarfechas;
+      6: self.buscartipo;
     End;
   Until op = 0;
 End;

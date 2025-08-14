@@ -6,7 +6,7 @@ Interface
 Type 
   TTipoEvento = (cumple, reunion, otro);
 
-  TEvento = Record
+  TDato = Record
     id: integer;
     fechainicio: string[10];
     fechafin: string[10];
@@ -16,11 +16,6 @@ Type
     titulo: string;
     descripcion: string;
     t_evento: TTipoEvento;
-  End;
-
-  Teventoaux = Record
-    cant: integer;
-    posiciones: array[1..200] Of integer;
   End;
 
 Implementation
