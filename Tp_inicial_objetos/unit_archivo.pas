@@ -6,20 +6,20 @@ Interface
 Uses unit_tipoeventos;
 
 Type 
-  ListaEventos=object
+  ListaEventos = Object
     eventos: File Of TEvento;
     cant: integer;
     Procedure CREARLISTA;
     Procedure AGREGAR (E:TEvento; Var id: integer);
     Procedure BUSCARPORID(id: integer; Var pos: Integer);
-    Procedure ELIMINAREVENTO (var id: integer;Var encontrado:
-                          boolean);
+    Procedure ELIMINAREVENTO (Var id: integer;Var encontrado:
+                              boolean);
     Procedure BUSCAR_titulo(BUSCADO: String; Var L_aux:
-                        Teventoaux);
+                            Teventoaux);
     Procedure BUSCAR_entre_fechas(fecha1, fecha2: String; Var
-                              L_aux: Teventoaux);
+                                  L_aux: Teventoaux);
     Procedure BUSCAR_tipo(tipo: TTipoEvento; Var L_aux:
-                      Teventoaux);
+                          Teventoaux);
     Procedure RECUPERAPOS (Var E: TEvento; pos: Integer);
   End;
 
@@ -45,7 +45,8 @@ Begin
   Reset(eventos);
   // o Rewrite si es nuevo
   Seek(eventos, cant);
-  id := FileSize(eventos) + 1;
+  // id := FileSize(eventos);
+  id := cant + 1;
   // Asignar un ID único
   E.id := id;
   // Asignar ID al evento
@@ -78,7 +79,7 @@ Begin
 End;
 
 Procedure ListaEventos.ELIMINAREVENTO (Var id: integer; Var encontrado:
-                          boolean);
+                                       boolean);
 
 Var 
   i, pos: Integer;
@@ -90,15 +91,24 @@ Begin
 
   If pos <> -1 Then
     Begin
-      For i:= pos To cant Do
+      encontrado := true;
+      If pos = (cant - 1) Then
         Begin
-          Seek(eventos, i + 1);
-          read(eventos, eventoTemp);
-          Seek(eventos, i);
-          Write(eventos, eventoTemp);
+          Truncate(eventos);
+          Dec(cant);
+        End
+      Else
+        Begin
+          For i:= pos To (cant - 1) Do
+            Begin
+              Seek(eventos, i + 1);
+              read(eventos, eventoTemp);
+              Seek(eventos, i);
+              Write(eventos, eventoTemp);
+            End;
+          Truncate(eventos);
+          Dec(cant);
         End;
-      Truncate(eventos);
-      Dec(cant);
     End
   Else
     encontrado := false;
@@ -107,7 +117,7 @@ Begin
 End;
 
 Procedure ListaEventos.BUSCAR_titulo(BUSCADO: String; Var L_aux:
-                        Teventoaux);
+                                     Teventoaux);
 
 Var 
   aux, i: integer;
@@ -131,7 +141,7 @@ End;
 
 
 Procedure ListaEventos.BUSCAR_entre_fechas(fecha1, fecha2: String; Var
-                              L_aux: Teventoaux);
+                                           L_aux: Teventoaux);
 
 Var 
   i: integer;
@@ -156,7 +166,7 @@ End;
 
 
 Procedure ListaEventos.BUSCAR_tipo(tipo: TTipoEvento; Var L_aux:
-                      Teventoaux);
+                                   Teventoaux);
 
 Var 
   i: integer;

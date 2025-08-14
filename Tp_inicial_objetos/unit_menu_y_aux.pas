@@ -4,20 +4,21 @@ Unit unit_menu_y_aux;
 Interface
 
 Uses 
- unit_lista, unit_tipoeventos;
-//unit_archivo, unit_tipoeventos;
-type 
-interfacemenu = object
-L:ListaEventos;
-Procedure cargar_datos( Var id: integer);
-Procedure eliminar;
-Procedure MUESTRA_LISTA;
-Procedure busqueda_titulo;
-Procedure buscarfechas;
-Procedure buscartipo;
-Procedure menu();
+//  unit_lista, unit_tipoeventos;
+unit_archivo, unit_tipoeventos;
 
- end;
+Type 
+  interfacemenu = Object
+    L: ListaEventos;
+    Procedure cargar_datos( Var id: integer);
+    Procedure eliminar;
+    Procedure MUESTRA_LISTA;
+    Procedure busqueda_titulo;
+    Procedure buscarfechas;
+    Procedure buscartipo;
+    Procedure menu();
+
+  End;
 
 
 Implementation
@@ -109,7 +110,7 @@ Begin
     End;
 End;
 
-Procedure MUESTRA_LISTA_AUX (var L:ListaEventos; var L_aux: Teventoaux);
+Procedure MUESTRA_LISTA_AUX (Var L:ListaEventos; Var L_aux: Teventoaux);
 
 Var 
   i: Integer;
