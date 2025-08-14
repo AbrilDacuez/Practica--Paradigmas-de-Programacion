@@ -3,16 +3,17 @@ Unit unit_menu_y_aux;
 
 Interface
 
-Uses 
-//  unit_lista, unit_tipoeventos;
+Uses
+// unit_lista, unit_tipoeventos;
 unit_archivo, unit_tipoeventos;
 
-Type 
+Type
   interfacemenu = Object
-    L: ListaEventos;
+    L: Lista;
     Procedure cargar_datos( Var id: integer);
     Procedure eliminar;
-    Procedure MUESTRA_LISTA;
+    Procedure MUESTRA_LISTA(List:Lista);
+    Procedure Muestra_datos (E:TDato);
     Procedure busqueda_titulo;
     Procedure buscarfechas;
     Procedure buscartipo;
@@ -25,7 +26,7 @@ Implementation
 
 Function cambia_fecha(fecha:String): string;
 
-Var 
+Var
   dia,mes,anio: string;
 Begin
   dia := copy(fecha,1,2);
@@ -36,9 +37,9 @@ End;
 
 Procedure interfacemenu.cargar_datos( Var id: integer);
 
-Var 
+Var
   tipo: byte;
-  E: TEvento;
+  E: TDato;
 Begin
   writeln('Ingrese titulo del evento:');
   readln(E.titulo);
@@ -58,94 +59,79 @@ Begin
   readln(E.ubicacion);
   writeln('Ingrese tipo de evento (1: cumple, 2: reunion, 3: otro):');
   readln(tipo);
-  Case tipo Of 
+  Case tipo Of
     1: E.t_evento := cumple;
     2: E.t_evento := reunion;
     Else E.t_evento := otro;
   End;
 
   L.AGREGAR(E, id);
-  // lo agrego a la lista
 End;
 
 Procedure interfacemenu.eliminar;
 
-Var 
+Var
   id: integer;
   encontrado: boolean;
 Begin
   Write('Ingrese el id a eliminar: ');
   ReadLn(id);
 
-  L.ELIMINAREVENTO( id, encontrado);
+  L.ELIMINAR(id, encontrado);
   If encontrado Then
     Writeln('Evento eliminado con exito')
   Else
     Writeln('No se encontro el evento con ID: ', id);
 End;
 
-Procedure Muestra_datos (E:TEvento);
+Procedure interfacemenu.Muestra_datos (E:TDato);
 Begin
   writeln('ID: ', E.id);
   writeln('Fecha Inicio: ', E.fechainicio);
   writeln('Fecha Fin: ', E.fechafin);
   writeln('Hora Inicio: ', E.horainicio);
   writeln('Hora Fin: ', E.horafin);
-  writeln('Ubicación: ', E.ubicacion);
-  writeln('Título: ', E.titulo);
-  writeln('Descripción: ', E.descripcion);
+  writeln('Ubicacion: ', E.ubicacion);
+  writeln('Titulo: ', E.titulo);
+  writeln('Descripcion: ', E.descripcion);
   writeln('Tipo de Evento: ', E.t_evento);
 End;
 
-Procedure interfacemenu.MUESTRA_LISTA;
+Procedure interfacemenu.MUESTRA_LISTA(List:Lista);
 
-Var 
+Var
   i: Integer;
-  E: TEvento;
+  E: TDato;
 Begin
-  For i:= 0 To (L.cant - 1) Do
+  For i:= 0 To (List.TAMANO - 1) Do
     Begin
-      L.RECUPERAPOS( E, i);
+      List.RECUPERAPOS( E, i);
       self.Muestra_datos(E);
-    End;
-End;
-
-Procedure MUESTRA_LISTA_AUX (Var L:ListaEventos; Var L_aux: Teventoaux);
-
-Var 
-  i: Integer;
-  E: TEvento;
-Begin
-  For i:= 1 To L_aux.cant Do
-    Begin
-      L.RECUPERAPOS( E, L_aux.posiciones[i]);
-      Muestra_datos(E);
     End;
 End;
 
 Procedure interfacemenu.busqueda_titulo;
 
-Var 
+Var
   sub: string;
-  l_aux: Teventoaux;
+  L_aux: Lista;
 Begin
-  Write('Ingrese la palabra del título: ');
+  Write('Ingrese la palabra del titulo: ');
   ReadLn(sub);
+  L.BUSCAR_titulo(sub, L_aux);
 
-  // arrancamos desde el primero
-  L.BUSCAR_titulo( sub, l_aux);
-
-  If l_aux.cant = 0 Then
-    Writeln('No se encontró ningún evento con ese título.')
+  If L_aux.TAMANO = 0 Then
+    Writeln('No se encontro ningun evento con ese titulo.')
   Else
-    MUESTRA_LISTA_AUX(L, l_aux);
+    MUESTRA_LISTA(L_aux);
+    L.DESTRUIR(L_aux);
 End;
 
 Procedure interfacemenu.buscarfechas;
 
-Var 
+Var
   fe1, fe2: string;
-  l_aux: Teventoaux;
+  L_aux: Lista;
 Begin
   write('Ingrese fecha 1: ');
   ReadLn(fe1);
@@ -155,45 +141,49 @@ Begin
   ReadLn(fe2);
   fe2 := cambia_fecha(fe2);
 
-  L.BUSCAR_entre_fechas( fe1, fe2, l_aux);
+  L.BUSCAR_entre_fechas( fe1, fe2, L_aux);
 
-  If l_aux.cant = 0 Then
+  If L_aux.TAMANO = 0 Then
     Writeln('No se encontraron eventos en el rango de fechas.')
   Else
-    MUESTRA_LISTA_AUX(L, l_aux);
+    MUESTRA_LISTA(L_aux);
+    L.DESTRUIR(L_aux);
 End;
 
 
 Procedure interfacemenu.buscartipo;
 
-Var 
+Var
   op: integer;
   tipo: TTipoEvento;
-  l_aux: Teventoaux;
+  l_aux: Lista;
 Begin
   Write('Ingrese tipo de evento (1: cumple, 2: reunion, 3: otro): ');
   ReadLn(op);
 
-  Case op Of 
+  Case op Of
     1: tipo := cumple;
     2: tipo := reunion;
     3: tipo := otro;
   End;
-  L.BUSCAR_tipo( tipo, l_aux);
+  L.BUSCAR_tipo(tipo, L_aux);
 
-  If l_aux.cant = 0 Then
-    Writeln('No se encontró ningún evento de ese tipo.')
+  If L_aux.TAMANO = 0 Then
+    Writeln('No se encontro ningun evento de ese tipo.')
   Else
-    MUESTRA_LISTA_AUX(L, l_aux);
+    MUESTRA_LISTA(L_aux);
+    L.DESTRUIR(L_aux);
 End;
 
 
 Procedure interfacemenu.menu();
 
-Var 
+Var
   op, ident: integer;
+  nom:string;
 Begin
-  L.CREARLISTA;
+  nom := 'lista.dat';
+  L.CREAR(nom);
   ident := 1;
   Repeat
     writeln('Sistema de eventos');
@@ -210,15 +200,16 @@ Begin
     Write('Ingrese una opcion: ');
     readln(op);
 
-    Case op Of 
+    Case op Of
       1: self.cargar_datos( ident);
-      2: self.MUESTRA_LISTA;
+      2: self.MUESTRA_LISTA(L);
       3: self.eliminar;
       4: self.busqueda_titulo;
       5: self.buscarfechas;
       6: self.buscartipo;
     End;
-  Until op = 0;
+    until op=0;
+    L.FINALIZAR;
 End;
 
 End.
