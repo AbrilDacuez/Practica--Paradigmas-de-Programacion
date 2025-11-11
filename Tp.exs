@@ -475,4 +475,4 @@ defmodule Nivel5 do
   end
 end
 
-IO.inspect(Nivel5.mayoresQue([5, 3, 8, 1, 4], 4))
+# IO.inspect(Nivel5.mayoresQue([5, 3, 8, 1, 4], 4))
