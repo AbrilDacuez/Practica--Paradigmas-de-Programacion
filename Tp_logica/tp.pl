@@ -106,5 +106,9 @@ elimElemento([L|R], X, [L|Res]) :-
 	elimElemento(R, X, Res).
 
 minSort([], []).
-minSort([L], L).
-% minSort(L,Res) :- minimo(L,M1),elimElemnto(L,M1,L1)
+minSort([L], [L]).
+minSort(L, Res) :-
+	minimo(L, M1),
+	elimElemento(L, M1, L1),
+	minSort(L1, Res1),
+	Res = [M1|Res1].
