@@ -94,3 +94,17 @@ moda([L|R], Res):-
 
 % -------------------------------------------
 
+% Nivel 5
+
+% Ej 45 minSort
+elimElemento([], _, []).
+elimElemento([L|R], X, Res) :-
+	L = X,
+	Res = R.
+elimElemento([L|R], X, [L|Res]) :-
+	L \= X,
+	elimElemento(R, X, Res).
+
+minSort([], []).
+minSort([L], L).
+% minSort(L,Res) :- minimo(L,M1),elimElemnto(L,M1,L1)
