@@ -14,25 +14,6 @@ minimo([P|R], M) :-
 	minimo(R, M),
 	P >= M.
 
-% Escriba una función que calcule los n primeros números primos y los devuelva en una lista.
-
-% IMPORTANTE ----->>> Acomodarlo en funcional primero
-
-% esPrimo(N) :-
-% 	N = 2.
-% esPrimo(N) :-
-% 	N = 3.
-
-% probarImpares(_, I, Lim, true) :-
-% 	I > Lim,
-% 	!.
-% probarImpares(N, I, _, false) :-
-% 	N mod I =:= 0,
-% 	!.
-% probarImpares(N, I, Lim, R) :-
-% 	In is I + 2,
-% 	probarImpares(N, In, Lim, R).
-
 % Ej 8
 eliminarIesimo([], _, []).
 eliminarIesimo([_|X], N, Res) :-
@@ -66,3 +47,50 @@ agregar([L|R], X, P, [L|Res]) :-
 	agregar(R, X, P1, Res).
 
 % -------------------------------------------
+
+% Nivel 3
+
+% Ej 20
+% IMPORTANTE ----->>> Acomodarlo en funcional primero
+
+% esPrimo(N) :-
+% 	N = 2.
+% esPrimo(N) :-
+% 	N = 3.
+
+% probarImpares(_, I, Lim, true) :-
+% 	I > Lim,
+% 	!.
+% probarImpares(N, I, _, false) :-
+% 	N mod I =:= 0,
+% 	!.
+% probarImpares(N, I, Lim, R) :-
+% 	In is I + 2,
+% 	probarImpares(N, In, Lim, R).
+
+% Ej 22
+frecuencia([], _, 0).
+frecuencia([P|R], X, Res) :-
+	P = X,
+	frecuencia(R, X, Res1),
+	Res is Res1 + 1.
+frecuencia([P|R], X, Res) :-
+	P \= X,
+	frecuencia(R, X, Res).
+
+moda([L], L).
+moda([L|R], Res) :-
+	frecuencia([L|R], L, F),
+		moda(R, M1),
+	frecuencia([L|R], M1, F2),
+	F > F2,
+	Res is L.
+moda([L|R], Res):-
+	frecuencia([L|R], L, F),
+		moda(R, M1),
+	frecuencia([L|R], M1, F2),
+	F2 >= F,
+		moda(R, Res).
+
+% -------------------------------------------
+
