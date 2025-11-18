@@ -131,3 +131,23 @@ elimMayores([L|R], N, Res) :-
 	L > N,
 	elimMayores(R, N, Res2),
 	Res = Res2.
+
+%Ej 47 N elementos del centro 
+eliminarBorde([], _, []).
+eliminarBorde(L, N, Res) :-
+	cant(L, C),
+	C = N,
+	Res = L.
+eliminarBorde(L, N, Res) :-
+	cant(L, C),
+	C < L.
+
+dejarDesdeCant([], _, 0, []).
+dejarDesdeCant([L|R],I,F,Res) :-
+	I = 1,
+	dejarDesdeCant([L|R],I,F2,Res2),
+	F2 is F -1, Res2 = 
+
+
+
+
