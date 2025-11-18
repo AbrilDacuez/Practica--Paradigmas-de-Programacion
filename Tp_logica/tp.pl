@@ -112,3 +112,22 @@ minSort(L, Res) :-
 	elimElemento(L, M1, L1),
 	minSort(L1, Res1),
 	Res = [M1|Res1].
+
+% Ej 46
+% Escriba una función que tome una lista de números y un número N, y devuelva la lista resultado de eliminar los N números mayores de la lista de entrada.
+
+elimMayores([], _, []).
+elimMayores([L], N, Res) :-
+	L > N,
+	Res = [].
+elimMayores([L], N, Res) :-
+	N >= L,
+	Res = [L].
+elimMayores([L|R], N, Res) :-
+	N >= L,
+	elimMayores(R, N, Res2),
+	Res = [L|Res2].
+elimMayores([L|R], N, Res) :-
+	L > N,
+	elimMayores(R, N, Res2),
+	Res = Res2.
