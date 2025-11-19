@@ -133,21 +133,34 @@ elimMayores([L|R], N, Res) :-
 	Res = Res2.
 
 %Ej 47 N elementos del centro 
-eliminarBorde([], _, []).
+% Ejemplo para L = (3 2 4 7 11 2 3 4) y N = 4, el resultado será (4 7 11 2).
+dejarDesdeCant(L, I, Res) :-
+	I = 1,
+	Res = L.
+dejarDesdeCant([_|R], I, Res) :-
+	I > 1,
+	I2 is I - 1,
+	dejarDesdeCant(R, I2, Res2),
+	Res = Res2.
+dejarHastaCant([L|_], F, Res) :-
+	F = 1,
+	Res = [L].
+dejarHastaCant([L|R], F, Res) :-
+	F > 1,
+	F2 is F - 1,
+	dejarHastaCant(R, F2, Res2),
+	Res = [L|Res2].
+
+% eliminarBorde([], _, []).
 eliminarBorde(L, N, Res) :-
 	cant(L, C),
 	C = N,
 	Res = L.
 eliminarBorde(L, N, Res) :-
 	cant(L, C),
-	C < L.
-
-dejarDesdeCant([], _, 0, []).
-dejarDesdeCant([L|R],I,F,Res) :-
-	I = 1,
-	dejarDesdeCant([L|R],I,F2,Res2),
-	F2 is F -1, Res2 = 
-
-
-
-
+	C > N,
+	F is (C - N)/2 + N,
+	dejarHastaCant(L, F, Res2),
+	I is (C - N)/2 + 1,
+	dejarDesdeCant(Res2, I, Res3),
+	Res = Res3.
