@@ -78,7 +78,7 @@ defmodule Parcial do
   end
 
   # ----------------------------------------------------------
-
+  # Final
   # Escriba una funcion que, dada una lista de sublistas de enteros, devuelva una nueva lista formada por todos los elementos de aquellas sublistas que sean estrictamente crecientes, intercalados de forma ordenada.
 
   # Ej: L = [[1,7],[5,5],[3,1],[],[4,10,15],[10]]
