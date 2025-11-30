@@ -71,10 +71,11 @@ lisSumIes(L, [S|Res2]) :-
 minimoLista([P], P).
 minimoLista([P|R], Res) :-
 	minimoLista(R, Res2),
-	P =< Res2,
+	P < Res2,
 	Res is P.
-minimoLista([_|R], Res) :-
-	minimoLista(R, Res).
+minimoLista([P|R], Res) :-
+	minimoLista(R, Res),
+	P >= Res.
 
 listCrec([]).
 listCrec([_]).
@@ -83,4 +84,38 @@ listCrec([P|R]) :-
 	P < Min,
 	listCrec(R).
 
+soloCrec([], []).
+soloCrec([P|R], [P|Res2]) :-
+	listCrec(P),
+	soloCrec(R, Res2).
+soloCrec([_|R], Res) :-
+	soloCrec(R, Res).
 
+linealiza([], []).
+linealiza([P|R], Res) :-
+	is_list(P),
+	linealiza(P, Res1),
+	linealiza(R, Res2),
+	append(Res1, Res2, Res).
+linealiza([P|R], [P|Res]) :-
+	linealiza(R, Res).
+
+elimElmList([], _, []).
+elimElmList([P|R], El, R) :-
+	P == El.
+elimElmList([P|R], El, [P|Res]) :-
+	elimElmList(R, El, Res).
+
+ordenar([], []).
+% ordenar([P], [P]).
+ordenar(L, [Res|Res2]) :-
+	minimoLista(L, Res),
+	% minimoLista(L, Min),
+	elimElmList(L, Res, L2),
+	ordenar(L2, Res2).
+
+resultParcial([], []).
+resultParcial(L, Res) :-
+	soloCrec(L, S),
+	linealiza(S, Lin),
+	ordenar(Lin, Res).
