@@ -56,3 +56,31 @@ lisSumIes(L, [S|Res2]) :-
 	elmNivel(L, N),
 	linNivel(N, Lin),
 	lisSumIes(Lin, Res2).
+
+  % ----------------------------------------------------------
+  % Final
+  % Escriba una funcion que, dada una lista de sublistas de enteros, devuelva una nueva lista formada por todos los elementos de aquellas sublistas que sean estrictamente crecientes, intercalados de forma ordenada.
+
+  % Ej: L = [[1,7],[5,5],[3,1],[],[4,10,15],[10]]
+
+  % Resultado: [1,4,7,10,10,15] ya que las sublistas estrictamente crecientes son
+
+  % [1,7],[],[4,10,15] y [10]
+
+% minimoLista([], nil).
+minimoLista([P], P).
+minimoLista([P|R], Res) :-
+	minimoLista(R, Res2),
+	P =< Res2,
+	Res is P.
+minimoLista([_|R], Res) :-
+	minimoLista(R, Res).
+
+listCrec([]).
+listCrec([_]).
+listCrec([P|R]) :-
+	minimoLista(R, Min),
+	P < Min,
+	listCrec(R).
+
+
