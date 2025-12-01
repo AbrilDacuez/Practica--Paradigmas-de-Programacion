@@ -138,6 +138,42 @@ defmodule Parcial do
   def resultParcial(l) do
     ordenar(linealiza(soloCrec(l)))
   end
+
+  # ---------------------------------------------------
+  # Final 2
+  # Escriba una funcion que tome como entrada una lista con sublistas L y reordene los elementos de la lista principal y cada sublista de tal manera que queden todos los numeros al principio y las listas al final (de la lista y cada sublista)
+
+  # Ej: L = [2,8,[3,1],2,[7,3,10,[4,2],9,[1]],4]
+  # Res: [2,8,2,4,[3,1],[7,3,10,9,[4,2],[1]]]
+
+  def dejarNum([]), do: []
+  def dejarNum([x|xs]) do
+    cond do
+      is_list(x) -> dejarNum(xs)
+      true -> [x | dejarNum(xs)]
+    end
+  end
+
+  def dejarListas([]), do: []
+  def dejarListas([x|xs]) do
+    cond do
+      is_list(x) -> [x | dejarListas(xs)]
+      true -> dejarListas(xs)
+    end
+  end
+
+  def reordena([]), do: []
+  def reordena([x|xs]) do
+    cond do
+      is_list(x) -> [dejarNum(reordena(x)) ++ dejarListas(reordena(x))] ++ reordena(xs)
+      true -> [x | reordena(xs)]
+    end
+  end
+
+  def respFinal2([]), do: []
+  def respFinal2(l) do
+    dejarNum(reordena(l)) ++ dejarListas(reordena(l))
+  end
 end
 
-IO.inspect(Parcial.resultParcial([[1,7],[5,5],[3,1],[],[4,10,15],[10]]), charlists: true)
+IO.inspect(Parcial.respFinal2([2,8,[3,1],2,[7,3,10,[4,2],9,[1]],4]), charlists: true)

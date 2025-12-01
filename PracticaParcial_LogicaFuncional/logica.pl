@@ -119,3 +119,43 @@ resultParcial(L, Res) :-
 	soloCrec(L, S),
 	linealiza(S, Lin),
 	ordenar(Lin, Res).
+
+  % ---------------------------------------------------
+  % Final 2
+  % Escriba una funcion que tome como entrada una lista con sublistas L y reordene los elementos de la lista principal y cada sublista de tal manera que queden todos los numeros al principio y las listas al final (de la lista y cada sublista)
+
+  % Ej: L = [2,8,[3,1],2,[7,3,10,[4,2],9,[1]],4]
+  % Res: [2,8,2,4,[3,1],[7,3,10,9,[4,2],[1]]]
+
+dejarNum([], []).
+dejarNum([P|R], Res) :-
+	is_list(P),
+	dejarNum(R, Res).
+dejarNum([P|R], [P|Res]):-
+	dejarNum(R, Res).
+
+dejarListas([], []).
+dejarListas([P|R], [P|Res]) :-
+	is_list(P),
+	dejarListas(R, Res).
+dejarListas([_|R], Res) :-
+	dejarListas(R, Res).
+
+reordena([], []).
+reordena([P|R], Res) :-
+	is_list(P),
+	reordena(P, Res1),
+	dejarNum(Res1, Res2),
+	dejarListas(Res1, Res3),
+	reordena(R, Res4),
+	append(Res2, Res3, Res5),
+	append([Res5], Res4, Res).
+reordena([P|R], [P|Res]) :-
+	reordena(R, Res).
+
+respFinal2([], []).
+respFinal2(L, Res) :-
+	reordena(L, Res1),
+	dejarNum(Res1, Res2),
+	dejarListas(Res1, Res3),
+	append(Res2, Res3, Res).
