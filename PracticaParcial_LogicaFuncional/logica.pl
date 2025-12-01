@@ -67,14 +67,16 @@ lisSumIes(L, [S|Res2]) :-
 
   % [1,7],[],[4,10,15] y [10]
 
-% minimoLista([], nil).
-minimoLista([P], P).
-minimoLista([P|R], Res) :-
-	minimoLista(R, Res2),
-	P =< Res2,
-	Res is P.
-minimoLista([_|R], Res) :-
-	minimoLista(R, Res).
+
+minimoLista([], 0).
+minimoLista([X], X).
+minimoLista([X|XS], X) :-
+	minimoLista(XS, R1),
+	X =< R1.
+minimoLista([X|XS], R2) :-
+	minimoLista(XS, R2),
+	X > R2.
+
 
 listCrec([]).
 listCrec([_]).
@@ -82,5 +84,49 @@ listCrec([P|R]) :-
 	minimoLista(R, Min),
 	P < Min,
 	listCrec(R).
+
+soloCrec([], []).
+soloCrec([X|XS], Res) :-
+	listCrec(X),
+	soloCrec(XS, Res2),
+	Res = [X|Res2].
+soloCrec([_|XS], Res2) :-
+	soloCrec(XS, Res2).
+
+linealiza([], []).
+linealiza([X|XS], Res) :-
+	is_list(X),
+	linealiza(X, R1),
+	linealiza(XS, R2),
+	append(R1, R2, Res).
+linealiza([X|XS], Res) :-
+	linealiza(XS, R1),
+	Res = [X|R1].
+
+elimElmLista([], _, []).
+elimElmLista([X|XS], Elem, XS) :-
+	X == Elem.
+elimElmLista([X|XS], Elem, [X|R1]) :-
+	elimElmLista(XS, Elem, R1).
+
+ordenar([], []).
+ordenar([X], [X]).
+ordenar([X|XS], R) :-
+	minimoLista([X|XS], R1),
+	elimElmLista([X|XS], R1, R2),
+	ordenar(R2, R3),
+	R = [R1|R3].
+
+resultParcial([], []).
+resultParcial(L, R) :-
+	soloCrec(L, R1),
+	linealiza(R1, R2),
+	ordenar(R2, R).
+
+
+
+
+
+
 
 
