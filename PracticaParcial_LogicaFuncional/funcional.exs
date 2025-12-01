@@ -87,8 +87,9 @@ defmodule Parcial do
 
   # [1,7],[],[4,10,15] y [10]
   def minimoLista([]), do: nil
-  def minimoLista([x]),do: x
-  def minimoLista([x|xs]) do
+  def minimoLista([x]), do: x
+
+  def minimoLista([x | xs]) do
     cond do
       x < minimoLista(xs) -> x
       true -> minimoLista(xs)
@@ -96,7 +97,8 @@ defmodule Parcial do
   end
 
   def listCrec([]), do: true
-  def listCrec([x|xs]) do
+
+  def listCrec([x | xs]) do
     cond do
       x < minimoLista(xs) -> listCrec(xs)
       true -> false
@@ -104,7 +106,8 @@ defmodule Parcial do
   end
 
   def soloCrec([]), do: []
-  def soloCrec([x|xs]) do
+
+  def soloCrec([x | xs]) do
     cond do
       listCrec(x) -> [x | soloCrec(xs)]
       true -> soloCrec(xs)
@@ -112,29 +115,32 @@ defmodule Parcial do
   end
 
   def linealiza([]), do: []
-  def linealiza([x|xs]) do
+
+  def linealiza([x | xs]) do
     cond do
       is_list(x) -> linealiza(x) ++ linealiza(xs)
-      true -> [ x | linealiza(xs) ]
+      true -> [x | linealiza(xs)]
     end
   end
 
+  def elimElmLista([], _), do: []
 
-  def elimElmLista([],_), do: []
-  def elimElmLista([x|xs],el) do
+  def elimElmLista([x | xs], el) do
     cond do
       x == el -> xs
-      true -> [x | elimElmLista(xs,el)]
+      true -> [x | elimElmLista(xs, el)]
     end
   end
 
   def ordenar([]), do: []
   def ordenar([x]), do: [x]
+
   def ordenar(l) do
-     [minimoLista(l) | ordenar(elimElmLista(l,minimoLista(l)))]
+    [minimoLista(l) | ordenar(elimElmLista(l, minimoLista(l)))]
   end
 
   def resultParcial([]), do: []
+
   def resultParcial(l) do
     ordenar(linealiza(soloCrec(l)))
   end
@@ -147,7 +153,8 @@ defmodule Parcial do
   # Res: [2,8,2,4,[3,1],[7,3,10,9,[4,2],[1]]]
 
   def dejarNum([]), do: []
-  def dejarNum([x|xs]) do
+
+  def dejarNum([x | xs]) do
     cond do
       is_list(x) -> dejarNum(xs)
       true -> [x | dejarNum(xs)]
@@ -155,7 +162,8 @@ defmodule Parcial do
   end
 
   def dejarListas([]), do: []
-  def dejarListas([x|xs]) do
+
+  def dejarListas([x | xs]) do
     cond do
       is_list(x) -> [x | dejarListas(xs)]
       true -> dejarListas(xs)
@@ -163,7 +171,8 @@ defmodule Parcial do
   end
 
   def reordena([]), do: []
-  def reordena([x|xs]) do
+
+  def reordena([x | xs]) do
     cond do
       is_list(x) -> [dejarNum(reordena(x)) ++ dejarListas(reordena(x))] ++ reordena(xs)
       true -> [x | reordena(xs)]
@@ -171,9 +180,60 @@ defmodule Parcial do
   end
 
   def respFinal2([]), do: []
+
   def respFinal2(l) do
     dejarNum(reordena(l)) ++ dejarListas(reordena(l))
   end
+
+  # ------------------------------------------
+  # Final 3
+  # Escriba la funcion Coinciden, que tome como entrada una lista L de numeros (sin sublistas) y una lista M que contiene sublistas, y devuelva otra lista formada unicamente por sublistas de un solo nivel. Estas sublistas deben ser aquellas de M que incluyan todos los elementos de L en su nivel 1 (es decir, sin considerar elementos que esten dentro de sublistas).
+
+  # Ejemplo:
+  # L = [2,6]
+  # M = [[6,2,[1,2],3],[8,6,4],[2,[2,2],7,5,6],[9,1,6]]
+  # Resultado: [[6,2,3],[2,7,5,6]]
+
+  def buscarElm([], []), do: false
+  def buscarElm([], [y]), do: false
+
+  def buscarElm([x | xs], [y]) do
+    cond do
+      x == y -> true
+      true -> buscarElm(xs, [y])
+    end
+  end
+
+  def buscarElm([x | xs], [y | ys]) do
+    cond do
+      x == y -> true && buscarElm([x | xs], ys)
+      true -> buscarElm(xs, [y]) && buscarElm([x | xs], ys)
+    end
+  end
+
+  def elimSubList([]), do: []
+
+  def elimSubList([x | xs]) do
+    cond do
+      is_list(x) -> elimSubList(xs)
+      true -> [x | elimSubList(xs)]
+    end
+  end
+
+  def coinciden([], []), do: []
+  def coinciden([], l2), do: []
+
+  def coinciden([x | xs], l2) do
+    cond do
+      buscarElm(x, l2) -> [elimSubList(x) | coinciden(xs, l2)]
+      true -> coinciden(xs, l2)
+    end
+  end
 end
 
-IO.inspect(Parcial.respFinal2([2,8,[3,1],2,[7,3,10,[4,2],9,[1]],4]), charlists: true)
+IO.inspect(
+  Parcial.coinciden([[6, 2, [1, 2], 3], [8, 6, 4], [2, [2, 2], 7, 5, 6], [9, 1, 6]], [2, 6]),
+  charlists: true
+)
+
+# IO.inspect(Parcial.buscarElm([8,6,4],[2,6]), charlists: true)

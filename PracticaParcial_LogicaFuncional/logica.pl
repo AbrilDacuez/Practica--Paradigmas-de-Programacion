@@ -159,3 +159,43 @@ respFinal2(L, Res) :-
 	dejarNum(Res1, Res2),
 	dejarListas(Res1, Res3),
 	append(Res2, Res3, Res).
+
+	% ------------------------------------------
+	% Final 3
+  % Escriba la funcion Coinciden, que tome como entrada una lista L de numeros (sin sublistas) y una lista M que contiene sublistas, y devuelva otra lista formada unicamente por sublistas de un solo nivel. Estas sublistas deben ser aquellas de M que incluyan todos los elementos de L en su nivel 1 (es decir, sin considerar elementos que esten dentro de sublistas).
+
+  % Ejemplo:
+  % L = [2,6]
+  % M = [[6,2,[1,2],3],[8,6,4],[2,[2,2],7,5,6],[9,1,6]]
+  % Resultado: [[6,2,3],[2,7,5,6]]
+
+buscarElm(_, []). 
+	% Para contemplar el vacio dentro del conjunto
+buscarElm([P|_], [S]) :-
+	P == S.
+buscarElm([P|R], [S]) :-
+	P \= S,
+	buscarElm(R, [S]).
+buscarElm([P|R], [S|T]) :-
+	P == S,
+	buscarElm([P|R], T).
+buscarElm([P|R], [S|_]) :-
+	P \= S,
+	buscarElm(R, [S]),
+	buscarElm([P|R], T).
+
+elimSubList([], []).
+elimSubList([P|R], Res):-
+	is_list(P),
+	elimSubList(R, Res).
+elimSubList([P|R], [P|Res]) :-
+	elimSubList(R, Res).
+
+coinciden([], [], []).
+coinciden([], _, []).
+coinciden([P|R], L2, [Res|Res2]) :-
+	buscarElm(P, L2),
+	elimSubList(P, Res),
+	coinciden(R, L2, Res2).
+coinciden([_|R], L2, Res) :-
+	coinciden(R, L2, Res).
