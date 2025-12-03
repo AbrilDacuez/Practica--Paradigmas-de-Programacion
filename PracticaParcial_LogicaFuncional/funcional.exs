@@ -3,34 +3,19 @@ defmodule Parcial do
   # ejercicio 1: escriba una funcion que reciba una lista sin sublistas L y un numero N y devuelva una lista con los elementos de L
   # que estan en las posiciones multiplos de N.
 
-  # def multiplos_de_n([], _N), do: []
-
-  # def multiplos_de_n_helper([], _N, _pos), do: []
-
-  # def multiplos_de_n_helper([l | xs], N, pos) do
-  #   cond do
-  #     rem(pos, N) == 0 ->
-  #       [l | multiplos_de_n_helper(xs, N, pos + 1)]
-  #       true
-  #       multiplos_de_n_helper(xs, N, pos + 1)
-  #   end
-  # end
-
-  # def multiplos_de_n([l | xs], N) do
-  #   multiplos_de_n_helper([l | xs], N, 1)
-  # end
-
   def cant([]), do: 0
   def cant([_ | xs]), do: 1 + cant(xs)
   # 3,4,5,6,7 2 --> 4,6
-  def mult([], _), do: []
 
-  def mult([l | xs], n) do
+  def multiplos([],_,_), do: []
+  def multiplos([l | xs], n, pos) do
     cond do
-      rem(cant([l | xs]), n) == 0 -> [l | mult(xs, n)]
-      true -> mult(xs, n)
+      rem(pos, n) == 0 -> [l | multiplos(xs, n,pos+1)]
+      true -> multiplos(xs, n,pos+1)
     end
   end
+
+  def mult(l,n), do: multiplos(l,n,1)
 
   # Ejercicio 2: Escriba una funcion que, dada una lista con sublistas L, devuelva una lista donde el iésimo elemento representa la sumatoria de los números contenidos en nivel i de profundidad de L. Si no hay elementos numéricos en un nivel específico, ese nivel tendrá valor 0 en la lista resultante.
   # Ej L=[1,[2,3],[[4,5],6],[7,[8,[9]]]] -> Res [1,18,17,9]
@@ -195,7 +180,7 @@ defmodule Parcial do
   # Resultado: [[6,2,3],[2,7,5,6]]
 
   def buscarElm([], []), do: false
-  def buscarElm([], [y]), do: false
+  def buscarElm([], [_]), do: false
 
   def buscarElm([x | xs], [y]) do
     cond do
@@ -221,7 +206,7 @@ defmodule Parcial do
   end
 
   def coinciden([], []), do: []
-  def coinciden([], l2), do: []
+  def coinciden([], _), do: []
 
   def coinciden([x | xs], l2) do
     cond do
@@ -229,11 +214,90 @@ defmodule Parcial do
       true -> coinciden(xs, l2)
     end
   end
+
+  # -------------------------------------
+  # Final 4
+  # Escriba una funcion que tome como entrada una lista con sublistas anidadas L y un numero N, y devuelva la suma de todos los elementos que se encuentran exactamente en el nivel N.
+
+  # Ej: L = [1,[2,3],[[4],5],[[[6]]]]   N = 2
+  # Resultado: 2 + 3 + 5 = 10
+
+  def sumaNivel([],_), do: 0
+  # Forma en la que Pascal separa en n = 1 y n > 1
+  def sumaNivel([x|xs], 1) do
+    cond do
+      is_list(x) -> sumaNivel(xs,1)
+      true -> x + sumaNivel(xs,1)
+    end
+  end
+  def sumaNivel([x|xs],n) do
+    cond do
+      is_list(x) -> sumaNivel(x, n - 1) + sumaNivel(xs,n)
+      true -> sumaNivel(xs, n)
+    end
+  end
+  # Primera forma en que la hice
+  # def sumaNivel([x|xs],n) do
+  #   cond do
+  #     is_list(x) && (n > 1) -> sumaNivel(x, n - 1) + sumaNivel(xs,n)
+  #     is_list(x) && (n == 1) -> sumaNivel(xs,1)
+  #     n == 1 -> x + sumaNivel(xs, 1)
+  #     true -> sumaNivel(xs, n)
+  #   end
+  # end
+
+  # -----------------------------------------------------
+  # Final 5
+  # Escriba una funcion que tome como entrada una lista L con sublistas de la forma (legajo listaNotas) que representan los legajos de los estudiantes inscriptos en un curso y la lista de sus notas en dicho curso. Devolver el legajo del estudiante de mayor promedio. Si un estudiante no rindió ningun examen la lista de notas estará vacia, y se considera que su nota es 0.
+
+  # Ej: L = [[1,[5,4,6]],[2,[8,7]],[3,[4]],[4,[5,9,5,3]]]
+  # Resultado: 2
+  # El legajo 2 tiene notas 8 y 7, con promedio 7.5)
+
+  def sumaLista([]), do: 0
+  def sumaLista([x|xs]), do: x + sumaLista(xs)
+
+  def cantidadLista([]), do: 0
+  def cantidadLista([_|xs]), do: 1 + cantidadLista(xs)
+
+  def promedio([]), do: 0
+  def promedio(l), do: sumaLista(l)/cantidadLista(l)
+
+  # quita el leg
+  def elimNum([]), do: []
+  def elimNum([x|xs]) do
+    cond do
+       is_list(x) -> [x | elimNum(xs)]
+       true -> elimNum(xs)
+    end
+  end
+
+  # linealiza
+  def lin([]), do: []
+  def lin([x|xs]) do
+    cond do
+      is_list(x) -> lin(x) ++ lin(xs)
+      true -> [x | lin(xs)]
+    end
+  end
+
+  def estudianteMayProm([]), do: []
+  def estudianteMayProm([x|xs]) do
+    cond do
+      promedio(lin(elimNum(x))) > promedio(lin(elimNum(estudianteMayProm(xs)))) -> x
+      true -> estudianteMayProm(xs)
+    end
+  end
+
+  def numEstMayProm(l), do: hd(estudianteMayProm(l))
 end
 
-IO.inspect(
-  Parcial.coinciden([[6, 2, [1, 2], 3], [8, 6, 4], [2, [2, 2], 7, 5, 6], [9, 1, 6]], [2, 6]),
-  charlists: true
-)
+ IO.inspect(Parcial.mult([4,5,9,6,12,8,6,5,4,3,2,3,5,10],7),charlists: true)
+# IO.inspect(Parcial.multp(3),charlists: true)
+# IO.inspect(Parcial.promedio([8,7]),charlists: true)
+# IO.inspect(Parcial.promedio([5,9,4]),charlists: true)
+# IO.inspect(tl([2,[8,7]]),charlists: true)
+# IO.inspect(Parcial.estudianteMayProm([[1,[5,4,6]],[2,[8,7]],[3,[4]],[4,[10,9,9,8]]]),charlists: true)
+# IO.inspect(Parcial.numEstMayProm([[1,[5,4,6]],[2,[8,7]],[3,[4]],[4,[10,9,9,8]]]),charlists: true)
 
 # IO.inspect(Parcial.buscarElm([8,6,4],[2,6]), charlists: true)

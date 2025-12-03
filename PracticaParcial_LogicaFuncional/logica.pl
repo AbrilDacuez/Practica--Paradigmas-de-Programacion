@@ -179,7 +179,7 @@ buscarElm([P|R], [S]) :-
 buscarElm([P|R], [S|T]) :-
 	P == S,
 	buscarElm([P|R], T).
-buscarElm([P|R], [S|_]) :-
+buscarElm([P|R], [S|T]) :-
 	P \= S,
 	buscarElm(R, [S]),
 	buscarElm([P|R], T).
@@ -199,3 +199,61 @@ coinciden([P|R], L2, [Res|Res2]) :-
 	coinciden(R, L2, Res2).
 coinciden([_|R], L2, Res) :-
 	coinciden(R, L2, Res).
+
+%  -------------------------------------
+  %  Final 4
+  %  Escriba una funcion que tome como entrada una lista con sublistas anidadas L y un numero N, y devuelva la suma de todos los elementos que se encuentran exactamente en el nivel N.
+
+  %  Ej: L = [1,[2,3],[[4],5],[[[6]]]]   N = 2
+  %  Resultado: 2 + 3 + 5 = 10
+
+sumaNivel([], _, 0).
+sumaNivel([P|R], 1, Res) :-
+	is_list(P),
+	sumaNivel(R, 1, Res).
+sumaNivel([P|R], 1, Res) :-
+	not(is_list(P)),
+	sumaNivel(R, 1, Res2),
+	Res is P + Res2.
+sumaNivel([P|R], N, Res) :-
+	N > 1,
+	is_list(P),
+	N2 is N - 1,
+	sumaNivel(P, N2, Res2),
+	sumaNivel(R, N, Res3),
+	Res is Res2 + Res3.
+sumaNivel([P|R], N, Res):-
+	N > 1,
+	not(is_list(P)),
+	sumaNivel(R, N, Res).
+
+  % Final 5
+  % Escriba una funcion que tome como entrada una lista L con sublistas de la forma (legajo listaNotas) que representan los legajos de los estudiantes inscriptos en un curso y la lista de sus notas en dicho curso. Devolver el legajo del estudiante de mayor promedio. Si un estudiante no rindió ningun examen la lista de notas estará vacia, y se considera que su nota es 0.
+
+  % Ej: L = [[1,[5,4,6]],[2,[8,7]],[3,[4]],[4,[5,9,5,3]]]
+  % Resultado: 2
+  % El legajo 2 tiene notas 8 y 7, con promedio 7.5)
+
+sumaLista([], 0).
+sumaLista([P|R], Res) :-
+	sumaLista(R, Res2),
+	Res is P + Res2.
+
+cantidadLista([], 0).
+cantidadLista([_|R], Res) :-
+	cantidadLista(R, Res2),
+	Res is 1 + Res2.
+
+promedio([], 0).
+promedio(L, Res) :-
+	sumaLista(L, Res1),
+	cantidadLista(L, Res2),
+	Res is Res1/Res2.
+
+elimNum([], []).
+elimNum([P|R], [P|Res]) :-
+	is_list(P),
+	elimNum(R, Res).
+elimNum([P|R], Res) :-
+	not(is_list(P)),
+	elimNum(R, Res).
