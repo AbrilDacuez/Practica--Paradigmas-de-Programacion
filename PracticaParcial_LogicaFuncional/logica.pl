@@ -288,3 +288,23 @@ max1([P|R], Res) :-
 	max1(R, Res),
 	P =< Res.
 
+buscarEl([P|_], E) :-
+	P == E.
+buscarEl([P|R], E) :-
+	P \= E,
+	buscarEl(R, E).
+
+buscarSec([], _, []).
+buscarSec(_, [], []).
+buscarSec(L, [P|R], [P|Res]) :-
+	buscarEl(L, P),
+	buscarSec(L, R, Res).
+buscarSec(L, [_|R], Res) :-
+	buscarSec(L, R, Res).
+
+listaSec([], _, []).
+listaSec([P|R], L, [Res|Res2]) :-
+	max1(L, M),
+	multAS(P, 0, M, Mul),
+	buscarSec(Mul, L, Res),
+	listaSec(R, L, Res2).
