@@ -290,11 +290,60 @@ defmodule Parcial do
   end
 
   def numEstMayProm(l), do: hd(estudianteMayProm(l))
+
+  # -----------------------------------------
+  # Parcial 06/02/2025
+  # Ejercicio 2
+  # Escriba la funcion que tome como entrada una lista de pares ordenados y una lista de numeros (sin sublistas), y devuelva otra lista que contenga una sublista por cada par, donde cada sublista incluya los elementos de la lista de numeros que pertenecen a la secuencia aritmetica definida por dicho par. Cada par (A,S) define una secuencia que comienza en A y aumenta en S unidades cada paso (A,A+S,A+2S,...). Si S es negativo, la sublista correspondiente debe estar vacia. Cada numero puede aparecer en multiples sublistas o en ninguna. Los elementos en cada sublista deben mantener el orden de aparicion en la lista original.
+
+  # Ej:
+  # Lista de pares:[[3,2],[6,0],[12,3],[7,1]]
+  # Lista de numeros: [4,6,4,10,3,2,5]
+  # Resultado: [[3,5],[6],[],[10]]
+  def multAS([x,0],_,_), do: [x]
+  def multAS([x,y],n,lim) do
+    cond do
+      y < 0 -> []
+      x+(y*n) > lim -> []
+      true -> [x+(y*n) | multAS([x,y],n+1,lim)]
+    end
+  end
+
+  def max([x]), do: x
+  def max([x|xs]) do
+    cond do
+      x > max(xs) -> x
+      true -> max(xs)
+    end
+  end
+
+  def buscarEl([],_), do: false
+  def buscarEl([x|xs],e) do
+    cond do
+      x == e -> true
+      true -> buscarEl(xs,e)
+    end
+  end
+
+  def buscarSec([],_), do: []
+  def buscarSec(_,[]), do: []
+  def buscarSec(l,[y|ys]) do
+    cond do
+      buscarEl(l,y) -> [y | buscarSec(l,ys)]
+      true -> buscarSec(l,ys)
+    end
+  end
+
+  def listaSec([],_), do: []
+  def listaSec([x|xs],l) do
+    [buscarSec(multAS(x,0,max(l)),l) | listaSec(xs,l)]
+  end
+
 end
 
- IO.inspect(Parcial.mult([4,5,9,6,12,8,6,5,4,3,2,3,5,10],7),charlists: true)
-# IO.inspect(Parcial.multp(3),charlists: true)
-# IO.inspect(Parcial.promedio([8,7]),charlists: true)
+# IO.inspect(Parcial.buscarSec([7, 8, 9, 10],[4,6,4,10,3,2,5]),charlists: true)
+# IO.inspect(Parcial.multAS([2,2],0,10),charlists: true)
+IO.inspect(Parcial.listaSec([[2,-2],[3,2],[6,0],[12,3],[7,1]],[4,6,4,10,3,2,5]),charlists: true)
 # IO.inspect(Parcial.promedio([5,9,4]),charlists: true)
 # IO.inspect(tl([2,[8,7]]),charlists: true)
 # IO.inspect(Parcial.estudianteMayProm([[1,[5,4,6]],[2,[8,7]],[3,[4]],[4,[10,9,9,8]]]),charlists: true)

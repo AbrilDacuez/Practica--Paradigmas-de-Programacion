@@ -257,3 +257,34 @@ elimNum([P|R], [P|Res]) :-
 elimNum([P|R], Res) :-
 	not(is_list(P)),
 	elimNum(R, Res).
+
+
+
+  %  -----------------------------------------
+  % Parcial 06/02/2025
+  %  Ejercicio 2
+  %  Escriba la funcion que tome como entrada una lista de pares ordenados y una lista de numeros (sin sublistas), y devuelva otra lista que contenga una sublista por cada par, donde cada sublista incluya los elementos de la lista de numeros que pertenecen a la secuencia aritmetica definida por dicho par. Cada par (A,S) define una secuencia que comienza en A y aumenta en S unidades cada paso (A,A+S,A+2S,...). Si S es negativo, la sublista correspondiente debe estar vacia. Cada numero puede aparecer en multiples sublistas o en ninguna. Los elementos en cada sublista deben mantener el orden de aparicion en la lista original.
+
+  %  Ej:
+  %  Lista de pares:[[3,2],[6,0],[12,3],[7,1]]
+  %  Lista de numeros: [4,6,4,10,3,2,5]
+  %  Resultado: [[3,5],[6],[],[10]]
+
+multAS([P, 0], _, _, [P]).
+multAS([_, S], _, _, []) :-
+	S < 0.
+multAS([P, S], N, Lim, []) :-
+	P + (S*N) > Lim.
+multAS([P, S], N, Lim, [Res|Res2]) :-
+	Res is P + (S*N),
+	N2 is N + 1,
+	multAS([P, S], N2, Lim, Res2).
+
+max1([P], P).
+max1([P|R], P) :-
+	max1(R, Res),
+	P > Res.
+max1([P|R], Res) :-
+	max1(R, Res),
+	P =< Res.
+
